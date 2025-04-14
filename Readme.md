@@ -13,3 +13,5 @@
 2. [Лабораторна робота №2](03-simple-entities%2FReadme.md)
 3. [Лабораторна робота №3](04-laravel%2FReadme.md)
 4. [Лабораторна робота №4](06-oauth-server%2FReadme.md)
+5. [Лабораторна робота №5](07-framework-auth%2FNestJsAuth.md)
+6. [Лабораторна робота №6](07-framework-auth%2FLaravelAuth.md)
