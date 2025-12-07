@@ -1,32 +1,45 @@
-import { Injectable } from '@nestjs/common';
-import {InjectRepository} from "@nestjs/typeorm";
-import {Category} from "./category.entity";
-import {DeleteResult, Repository} from "typeorm";
-import {IPaginationOptions, paginate, Pagination} from "nestjs-typeorm-paginate";
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { CreateCategoryDto } from './dto/create-category.dto';
+import { UpdateCategoryDto } from './dto/update-category.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Category } from './entities/category.entity';
+import { paginate, PaginateQuery, Paginated } from 'nestjs-paginate';
 
 @Injectable()
 export class CategoriesService {
-    constructor(
-        @InjectRepository(Category)
-        private repository: Repository<Category>,
-    ) {}
+  constructor(
+    @InjectRepository(Category)
+    private categoryRepository: Repository<Category>,
+  ) {}
 
-    public create(categoryData: Category): Promise<Category> {
-        return this.repository.save(categoryData);
-    }
+  create(createCategoryDto: CreateCategoryDto) {
+    return this.categoryRepository.save(createCategoryDto);
+  }
 
-    public findAll(): Promise<Category[]> {
-        return this.repository.find();
-    }
+  findAll(query: PaginateQuery): Promise<Paginated<Category>> {
+    return paginate(query, this.categoryRepository, {
+      sortableColumns: ['id', 'name', 'created_at'],
+      nullSort: 'last',
+      defaultSortBy: [['created_at', 'DESC']],
+      searchableColumns: ['name', 'description'],
+      filterableColumns: {},
+    });
+  }
 
-    public findOne(id: number): Promise<Category | null> {
-        return this.repository.findOneBy({ id });
-    }
+  async findOne(id: string) {
+    const category = await this.categoryRepository.findOne({ where: { id } });
+    if (!category) throw new NotFoundException('Category not found');
+    return category;
+  }
 
-    public  remove(id: number): Promise<DeleteResult>{
-        return this.repository.delete(id);
-    }
-    public paginate(options: IPaginationOptions): Promise<Pagination<Category>> {
-        return paginate<Category>(this.repository, options);
-    }
+  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
+    await this.categoryRepository.update(id, updateCategoryDto);
+    return this.findOne(id);
+  }
+
+  async remove(id: string) {
+    const category = await this.findOne(id);
+    return this.categoryRepository.remove(category);
+  }
 }
