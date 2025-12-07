@@ -1,36 +1,35 @@
-version: "3.1"
+version: '3.8'
 services:
   nginx:
     image: nginx:alpine
-    restart: always
     ports:
       - "8000:80"
     volumes:
-      - ./frontend/dist:/srv/www/static
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+      - ./php-app:/var/www/html
     depends_on:
       - php
-      - nodejs
-  nodejs:
-    image: node:alpine
-    environment:
-      NODE_ENV: production
-    working_dir: /home/app
-    restart: always
-    ports:
-      - "8001:3000"
-    volumes:
-      - ./node-app:/home/app
-    depends_on:
-      - php
-    command: ["npm", "run", "start:dev"]
+      - node
+      - python
 
   php:
-    image: webdevops/php-nginx:8.2
-    
+    build: ./php-app
     volumes:
-      - ./php-app:/app
+      - ./php-app:/var/www/html
     ports:
-      - "8003:80"
-    environment:
-      WEB_DOCUMENT_ROOT: /app/public
+      - "9000:9000"
+
+  node:
+    build: ./node-app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./node-app:/usr/src/app
+      - /usr/src/app/node_modules
+
+  python:
+    build: ./python-app
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./python-app:/app
