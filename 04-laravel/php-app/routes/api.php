@@ -1,10 +1,9 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\SubscriberController;
+use App\Http\Controllers\SubscriptionController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-
-Route::resource('/subscribers',\App\Http\Controllers\Api\SubscriberController::class);
+// Привязываем контроллеры к /api/subscribers и /api/subscriptions
+Route::apiResource('subscribers', SubscriberController::class);
+Route::apiResource('subscriptions', SubscriptionController::class);

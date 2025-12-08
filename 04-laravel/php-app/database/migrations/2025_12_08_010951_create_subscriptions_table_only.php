@@ -13,16 +13,13 @@ return new class extends Migration
     {
         Schema::create('subscriptions', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
+            $table->string('service');
+            $table->string('topic');
+            $table->json('payload')->nullable();
+            $table->timestamp('expired_at')->nullable();
+            // ВАЖНО: Внешний ключ пока не добавляем!
+            $table->unsignedBigInteger('subscriber_id'); // <--- ВРЕМЕННЫЙ СТОЛБЕЦ
             $table->timestamps();
-        });
-        Schema::create('subscriber_subscription', function (Blueprint $table) {
-            $table->unsignedBigInteger("subscription_id");
-            $table->unsignedBigInteger("subscriber_id");
-            $table->foreign('subscription_id')->references('id')->on('subscriptions')
-                ->onDelete('cascade');
-            $table->foreign('subscriber_id')->references('id')->on('subscribers')
-                ->onDelete('cascade');
         });
     }
 

@@ -29,7 +29,6 @@ export class ProductsService {
     });
   }
 
-  // Метод для получения продуктов конкретной категории (нужен для эндпоинта /categories/:id/products)
   findAllByCategory(categoryId: string, query: PaginateQuery) {
     const queryBuilder = this.productRepository.createQueryBuilder('product')
       .where('product.category_id = :categoryId', { categoryId });
