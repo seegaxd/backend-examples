@@ -1,0 +1,298 @@
+openapi: 3.0.0
+info:
+  title: Subscriber and Subscription API
+  version: 1.0.0
+  description: API to manage subscribers and their subscriptions.
+servers:
+  - url: http://localhost:8081/api
+    description: Main API Server
+  - url: http://localhost/php
+    description: Main API Server
+
+paths:
+  /subscribers:
+    get:
+      summary: Get all subscribers
+      tags:
+        - Subscribers
+      responses:
+        '200':
+          description: A list of subscribers with pagination metadata
+          $ref:
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Subscriber'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  links:
+                    $ref: '#/components/schemas/Links'
+    post:
+      tags:
+        - Subscribers
+      summary: Create a new subscriber
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscriber'
+      responses:
+        '201':
+          description: The created subscriber
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscriber'
+  
+  /subscribers/{subscriberId}:
+    get:
+      tags:
+        - Subscribers
+      summary: Get a specific subscriber
+      parameters:
+        - name: subscriberId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A specific subscriber
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscriber'
+        '404':
+          description: Subscriber not found
+    put:
+      tags:
+        - Subscribers
+      summary: Update a specific subscriber
+      parameters:
+        - name: subscriberId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscriber'
+      responses:
+        '200':
+          description: The updated subscriber
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscriber'
+    delete:
+      tags:
+        - Subscribers
+      summary: Delete a specific subscriber
+      parameters:
+        - name: subscriberId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Subscriber deleted successfully
+  
+  /subscriptions:
+    get:
+      summary: Get all subscriptions
+      tags:
+        - Subscriptions
+      responses:
+        '200':
+          description: A list of subscriptions with pagination metadata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Subscription'
+                  meta:
+                    $ref: '#/components/schemas/Meta'
+                  links:
+                    $ref: '#/components/schemas/Links'
+    post:
+      tags:
+        - Subscriptions
+      summary: Create a new subscription
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+      responses:
+        '201':
+          description: The created subscription
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+  
+  /subscriptions/{subscriptionId}:
+    get:
+      tags:
+        - Subscriptions
+      summary: Get a specific subscription
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A specific subscription
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+        '404':
+          description: Subscription not found
+    put:
+      tags:
+        - Subscriptions
+      summary: Update a specific subscription
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Subscription'
+      responses:
+        '200':
+          description: The updated subscription
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subscription'
+    delete:
+      tags:
+        - Subscriptions
+      summary: Delete a specific subscription
+      parameters:
+        - name: subscriptionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Subscription deleted successfully
+
+components:
+  schemas:
+    Subscriber:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the subscriber
+        email:
+          type: string
+          description: Subscriber's email address
+        name:
+          type: string
+          description: Name of the subscriber
+        subscriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subscription'
+          description: List of subscriptions for the subscriber
+    
+    Subscription:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the subscription
+        service:
+          type: string
+          description: Name of the service being subscribed to
+        topic:
+          type: string
+          description: Topic of the subscription
+        payload:
+          type: object
+          description: Data associated with the subscription
+        expired_at:
+          type: string
+          format: date-time
+          description: Expiration date of the subscription
+    Links:
+      type: object
+      properties:
+        first:
+          type: string
+          description: URL to the first page
+        last:
+          type: string
+          description: URL to the last page
+        prev:
+          type: string
+          nullable: true
+          description: URL to the previous page, if any
+        next:
+          type: string
+          nullable: true
+          description: URL to the next page, if any
+    Meta:
+      type: object
+      properties:
+        current_page:
+          type: integer
+          description: Current page number
+        from:
+          type: integer
+          nullable: true
+          description: Starting item number
+        last_page:
+          type: integer
+          description: Last page number
+        links:
+          type: array
+          items:
+            type: object
+            properties:
+              url:
+                type: string
+                nullable: true
+                description: URL for the page link
+              label:
+                type: string
+                description: Display label for the page link
+              active:
+                type: boolean
+                description: Indicates if the link is for the current active page
+        path:
+          type: string
+          description: Base URL for the pagination
+        per_page:
+          type: integer
+          description: Number of items per page
+        to:
+          type: integer
+          nullable: true
+          description: Ending item number
+        total:
+          type: integer
+          description: Total number of items
